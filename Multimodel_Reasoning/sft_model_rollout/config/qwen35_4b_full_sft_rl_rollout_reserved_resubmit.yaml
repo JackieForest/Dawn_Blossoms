@@ -1,0 +1,62 @@
+name: qwen35_4b_full_sft_rl_rollout
+task: sft_model_rl_rollout
+
+source_data: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/training/rl_data/rl_pool_filter.parquet
+data_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/training/rl_data
+output_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/sft_model_rollout/output/qwen35_4b_full_sft_rl_rollout
+hf_datasets_cache_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/sft_model_rollout/output/qwen35_4b_full_sft_rl_rollout/hf_datasets_cache
+num_splits: 400
+
+model: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/training/models/qwen35_4b_base_full_distill_sft_528k_16k
+prompt: prompts/qwen35_4b_full_sft_rl_rollout.txt
+system_prompt: "You are a helpful assistant. When answering the question, first provide the reasoning process enclosed in <think>...</think> tags. Then provide the final answer enclosed in <answer>...</answer> tags."
+use_image: true
+enable_thinking: true
+rollouts_per_sample: 8
+
+temperature: 1.0
+top_p: 1.0
+top_k: -1
+min_p: 0.0
+presence_penalty: 0.0
+repetition_penalty: 1.0
+max_tokens: 16384
+max_retries: 3
+request_timeout: 1800
+
+max_concurrent: 16
+max_pending_multiplier: 1
+
+success_dir_name: rollouts
+failed_dir_name: failed_rollouts
+valid_key: rollout_valid
+
+split_workers: 8
+split_arrow_threads: 2
+
+vllm:
+  container: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm-v0.17.1.sif
+  pythonpath: /mnt/dhwfile/raise/user/linhonglin/mmfinereason/eval/vllm_patch/lib
+  runtime_cache_root: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/sft_model_rollout/output/qwen35_4b_full_sft_rl_rollout/runtime_cache
+  max_model_len: 64000
+  tensor_parallel_size: 1
+  max_num_seqs: 64
+  gpu_memory_utilization: 0.90
+  gpu_min_free_gb: 25
+  startup_timeout: 600
+  base_port: 9900
+  clean_process: true
+  enable_expert_parallel: false
+  enforce_eager: true
+  async_scheduling: true
+  enable_chunked_prefill: true
+
+slurm:
+  partition: sciverse_agent
+  quota_type: reserved
+  reserved_min_running: 0
+  reserved_quota_type: reserved
+  spot_quota_type: spot
+  gpus: 1
+  time: 43200
+  exclude: "SH-IDC1-10-140-37-72,SH-IDCA1404-10-140-54-53,SH-IDCA1404-10-140-54-92,SH-IDC1-10-140-37-46"

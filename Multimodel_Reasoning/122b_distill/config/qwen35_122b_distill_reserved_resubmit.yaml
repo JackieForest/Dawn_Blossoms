@@ -1,0 +1,60 @@
+name: qwen35_122b_distill
+task: distill_rollout
+
+source_data: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill/splits
+data_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill
+output_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill
+hf_datasets_cache_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill/hf_datasets_cache
+
+num_splits: 100
+model: /mnt/dhwfile/raise/user/linhonglin/hf/huggingface/hub/models--Qwen--Qwen3.5-122B-A10B/snapshots/b000b2eb18a7f4cdf3153c4215842da339e09d99
+prompt: prompts/qwen35_122b_distill.txt
+use_image: true
+enable_thinking: false
+
+rollouts_per_sample: 4
+temperature: 0.7
+top_p: 0.95
+top_k: 20
+min_p: 0.0
+presence_penalty: 1.5
+repetition_penalty: 1.0
+max_tokens: 16384
+max_retries: 3
+request_timeout: 1800
+max_concurrent: 4
+max_pending_multiplier: 1
+
+success_dir_name: rollouts
+failed_dir_name: failed_rollouts
+valid_key: rollout_valid
+
+split_workers: 4
+split_arrow_threads: 2
+
+vllm:
+  container: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm-v0.17.1.sif
+  pythonpath: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm_extra
+  runtime_cache_root: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill/runtime_cache
+  max_model_len: 49152
+  tensor_parallel_size: 4
+  max_num_seqs: 8
+  gpu_memory_utilization: 0.96
+  gpu_min_free_gb: 40
+  startup_timeout: 1200
+  base_port: 9900
+  clean_process: true
+  enable_expert_parallel: false
+  enforce_eager: true
+  async_scheduling: true
+  enable_chunked_prefill: true
+
+slurm:
+  partition: sciverse_agent
+  quota_type: reserved
+  reserved_min_running: 0
+  reserved_quota_type: reserved
+  spot_quota_type: spot
+  gpus: 4
+  time: 43200
+  exclude: "SH-IDCA1404-10-140-54-4,SH-IDCA1404-10-140-54-101,SH-IDCA1404-10-140-54-116,SH-IDCA1404-10-140-54-113,SH-IDC1-10-140-37-35,SH-IDC1-10-140-37-4"

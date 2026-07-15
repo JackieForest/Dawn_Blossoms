@@ -1,0 +1,59 @@
+# Qwen3.5-27B judge config for verifying Qwen3.5-4B rollouts.
+
+name: qwen35_27b_verify
+task: rollout_verify
+
+input_rollout_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_4b_pr/rollouts
+output_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_27b_verify
+hf_datasets_cache_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_27b_verify/hf_datasets_cache
+num_splits: 100
+
+model: /mnt/dhwfile/raise/user/linjuekai/models/Qwen3.5-27B
+prompt: prompts/verify_rollout.txt
+enable_thinking: false
+expected_rollouts: 4
+
+# Instruct/non-thinking sampling for general tasks.
+temperature: 0.7
+top_p: 0.8
+top_k: 20
+min_p: 0.0
+presence_penalty: 1.5
+repetition_penalty: 1.0
+max_tokens: 8
+max_retries: 3
+request_timeout: 300
+max_concurrent: 64
+max_pending_multiplier: 2
+
+success_dir_name: verify
+failed_dir_name: failed_verify
+valid_key: verify_valid
+stop_file_prefix: verify
+
+vllm:
+  container: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm-v0.17.1.sif
+  pythonpath: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm_extra
+  runtime_cache_root: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_27b_verify/runtime_cache
+  max_model_len: 20000
+  tensor_parallel_size: 2
+  max_num_seqs: 128
+  gpu_memory_utilization: 0.90
+  gpu_min_free_gb: 40
+  startup_timeout: 900
+  base_port: 9500
+  clean_process: true
+  enable_expert_parallel: false
+  enforce_eager: true
+  async_scheduling: true
+  enable_chunked_prefill: true
+
+slurm:
+  partition: sciverse_agent
+  quota_type: spot
+  reserved_min_running: 40
+  reserved_quota_type: reserved
+  spot_quota_type: spot
+  gpus: 2
+  time: 43200
+  exclude: "SH-IDCA1404-10-140-54-101,SH-IDCA1404-10-140-54-116"

@@ -1,0 +1,47 @@
+name: qwen35_27b_left_best_of_n
+task: answer_likelihood_best_of_n
+
+input_splits_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/distill_results/27b_distill_left/final_splits
+input_rollouts_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/distill_results/27b_distill_left/rollouts
+output_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/distill_results/27b_distill_left/best_rollouts
+hf_datasets_cache_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/distill_results/27b_distill_left/best_rollouts/hf_datasets_cache
+
+num_splits: 5
+num_shards: 5
+model: /mnt/dhwfile/raise/user/linjuekai/models/Qwen3.5-27B
+prompt: /mnt/petrelfs/linjuekai/Multimodel_Reasoning/27b_distill/prompts/qwen35_27b_distill.txt
+use_image: true
+
+request_timeout: 1800
+max_retries: 3
+max_concurrent: 8
+score_top_logprobs: 1
+rollouts_per_sample: 4
+selection_method: 27b_normalized_answer_likelihood
+
+vllm:
+  container: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm-v0.17.1.sif
+  pythonpath: /mnt/dhwfile/raise/user/linhonglin/apptainer/vllm_extra
+  runtime_cache_root: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/distill_results/27b_distill_left/best_rollouts/runtime_cache
+  max_model_len: 64000
+  tensor_parallel_size: 2
+  max_num_seqs: 32
+  gpu_memory_utilization: 0.90
+  gpu_min_free_gb: 40
+  startup_timeout: 900
+  base_port: 14900
+  clean_process: true
+  enable_expert_parallel: false
+  enforce_eager: true
+  async_scheduling: true
+  enable_chunked_prefill: true
+
+slurm:
+  partition: sciverse_agent
+  quota_type: reserved
+  reserved_min_running: 0
+  reserved_quota_type: reserved
+  spot_quota_type: spot
+  gpus: 2
+  time: 43200
+  exclude: "SH-IDCA1404-10-140-54-101,SH-IDCA1404-10-140-54-116,SH-IDCA1404-10-140-54-4,SH-IDC1-10-140-37-4"

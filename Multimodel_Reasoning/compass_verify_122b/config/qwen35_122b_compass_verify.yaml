@@ -1,0 +1,41 @@
+name: qwen35_122b_compass_verify
+task: compass_verify_distill_rollouts
+
+# Read-only distill outputs. These files are not modified by this project.
+input_rollout_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill/rollouts
+
+# Verification outputs are written under this directory.
+output_dir: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill
+success_dir_name: verify_response
+failed_dir_name: failed_verify_response
+stop_dir_name: verify_response_stop_files
+num_splits: 100
+expected_rollouts: 4
+
+verifier_model: /mnt/dhwfile/raise/user/caimengzhang/huggingface/hub/models--opencompass--CompassVerifier-7B/snapshots/676c83e3c62c199e0d6ad29cd31b6064c8d500a0
+candidate_field: response
+fallback_candidate_field: response
+
+batch_size: 64
+max_model_len: 32768
+max_tokens: 2048
+temperature: 0.000001
+top_p: 0.9
+top_k: 1
+gpu_memory_utilization: 0.85
+enforce_eager: true
+
+vllm:
+  container: /mnt/dhwfile/raise/user/caimengzhang/env/vmleval.sif
+  runtime_cache_root: /mnt/dhwfile/raise/user/linjuekai/Multimodel_Reasoning/rollouts/output/qwen35_122b_distill/verify_runtime_cache
+  tensor_parallel_size: 1
+
+slurm:
+  partition: sciverse_agent
+  quota_type: reserved
+  reserved_min_running: 0
+  reserved_quota_type: reserved
+  spot_quota_type: reserved
+  gpus: 1
+  time: 43200
+  exclude: ""
